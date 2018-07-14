@@ -1,14 +1,14 @@
-int  led = 8;
+const int  PORTA_LED = GPIO_NUM_8;
 
-void setup() { 
+void setup() {
 
-pinMode(led,OUTPUT);
+  pinMode(PORTA_LED, OUTPUT);
+
 }
 
-void loop() {  
-
-digitalWrite(led,HIGH); 
-delay(500);             
-digitalWrite(led,LOW);  
-delay(500);        
+void loop() {
+  digitalWrite(PORTA_LED, HIGH);
+  delay(500);
+  digitalWrite(PORTA_LED, LOW);
+  delay(500);
 }
