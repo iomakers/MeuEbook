@@ -16,7 +16,7 @@
 #include "HMC5883L.h"
 #include "BMP085.h"
 #include "ADXL345.h"
-
+#include <sys/time.h>
 
 
 const char *ssid = "MS NET";
@@ -61,7 +61,8 @@ static void leituraAcel(void * );
 static void updateJSON(void * );
 void sendJSON();
 
- SemaphoreHandle_t xSemaphore = NULL;
+SemaphoreHandle_t xSemaphore = NULL;
+
 
 void setup()
  {
@@ -98,10 +99,12 @@ void setup()
   
    delay(100);
    xTaskCreatePinnedToCore(leituraGyro, "leituraGyro", 4096,   NULL, 1, NULL, 1);
-   //xTaskCreatePinnedToCore(leituraMag, "leituraMag", 4096,   NULL, 2, NULL, 1);
-   //xTaskCreatePinnedToCore(leituraBarometro, "leituraBarometro", 4096,   NULL, 3, NULL, 1);
-   //xTaskCreatePinnedToCore(leituraAcel, "leituraAcel", 4096,   NULL, 1, NULL, 1);
+   xTaskCreatePinnedToCore(leituraMag, "leituraMag", 4096,   NULL, 2, NULL, 1);
+   xTaskCreatePinnedToCore(leituraBarometro, "leituraBarometro", 4096,   NULL, 3, NULL, 1);
+   xTaskCreatePinnedToCore(leituraAcel, "leituraAcel", 4096,   NULL, 1, NULL, 1);
    xTaskCreatePinnedToCore(updateJSON, "updateJSON", 4096,   NULL, 1, NULL,1);
+
+   xSemaphore = xSemaphoreCreateMutex();
    
 }
 
@@ -127,7 +130,7 @@ static void updateJSON(void *){
   JsonArray& dataBAROM = JSONencoder.createNestedArray("BAR");
   JsonArray& dataMAG =   JSONencoder.createNestedArray("MAG");
   JSONencoder["device"] = "ESP32";
-  JSONencoder["timestamp"] = "ESP32";
+  JSONencoder["timestamp"] = get_sec();
   dataGYRO.add(avx);
   dataGYRO.add(avy);
   dataGYRO.add(avz);
@@ -151,10 +154,14 @@ static void leituraGyro(void *){
 
    while(1){
       // realizar leitura do sensor de gyro
-   
-       gyro.getAngularVelocity(&avx, &avy, &avz);
-       
-       
+      if( xSemaphore != NULL )
+      {
+         if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+         {
+         gyro.getAngularVelocity(&avx, &avy, &avz);
+         xSemaphoreGive( xSemaphore );
+         }
+      }
        
        vTaskDelay(250 / portTICK_PERIOD_MS);
    }
@@ -164,11 +171,16 @@ static void leituraGyro(void *){
  // Tarefa da leitura do sensor magnetometro
 static void leituraMag(void *){
    while(1){
-
-    
-  	// realizar leitura do magnetometro
-    	mag.getHeading(&mx, &my, &mz);
-     
+     if( xSemaphore != NULL )
+       {
+        if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+         {
+      	// realizar leitura do magnetometro
+        	    mag.getHeading(&mx, &my, &mz);
+              xSemaphoreGive( xSemaphore );
+         }
+       }
+      
       // realizar um delay e inicializar leitura daqui a 50 ms
      vTaskDelay(200 / portTICK_PERIOD_MS);
    }
@@ -178,22 +190,27 @@ static void leituraMag(void *){
 static void leituraBarometro(void *){
 
    while(1){
-    
-      // Coloca barometro no modo de temperatura
-     barometer.setControl(BMP085_MODE_TEMPERATURE);
-
-     //realizar leitura de temperatura em Celsius
-     temperatura = barometer.getTemperatureC();
-
-     // Coloca em modo leitura de pressão
-     barometer.setControl(BMP085_MODE_PRESSURE_3);
-
-     // realiza leitura da pressão em Pascais (Pa)
-     pressao = barometer.getPressure();
-
-     // Calcula valor da altitude baseado na leitura de pressão
-     altitude = barometer.getAltitude(pressao);
-    
+    if( xSemaphore != NULL )
+      {
+         if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+         {
+              // Coloca barometro no modo de temperatura
+             barometer.setControl(BMP085_MODE_TEMPERATURE);
+        
+             //realizar leitura de temperatura em Celsius
+             temperatura = barometer.getTemperatureC();
+        
+             // Coloca em modo leitura de pressão
+             barometer.setControl(BMP085_MODE_PRESSURE_3);
+        
+             // realiza leitura da pressão em Pascais (Pa)
+             pressao = barometer.getPressure();
+        
+             // Calcula valor da altitude baseado na leitura de pressão
+             altitude = barometer.getAltitude(pressao);
+             xSemaphoreGive( xSemaphore );
+         }
+      }
       // realizar um delay e inicializar leitura daqui a 50 ms
      vTaskDelay(200 / portTICK_PERIOD_MS);
    }
@@ -203,21 +220,40 @@ static void leituraBarometro(void *){
 static void leituraAcel(void *){
 
    while(1){
-
-   
-      // Realizar leitura do sensor acelerametro
-        accel.getAcceleration(&Xg, &Yg, &Zg);
-        // Filtro passa baixo
-   	  fXg = (Xg/256.0) * alpha + (fXg * (1.0 - alpha));
-   	  fYg = (Yg/256.0) * alpha + (fYg * (1.0 - alpha));
-   	  fZg = (Zg/256.0) * alpha + (fZg * (1.0 - alpha));
-
-   	  // Equações do Roll e PITCH
-   	  roll = (atan2(-fYg, fZg)*180.0)/M_PI;
-   	  pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+      if( xSemaphore != NULL )
+         {
+         if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+         {
+         
+            // Realizar leitura do sensor acelerametro
+              accel.getAcceleration(&Xg, &Yg, &Zg);
+              // Filtro passa baixo
+         	  fXg = (Xg/256.0) * alpha + (fXg * (1.0 - alpha));
+         	  fYg = (Yg/256.0) * alpha + (fYg * (1.0 - alpha));
+         	  fZg = (Zg/256.0) * alpha + (fZg * (1.0 - alpha));
       
+         	  // Equações do Roll e PITCH
+         	  roll = (atan2(-fYg, fZg)*180.0)/M_PI;
+         	  pitch = (atan2(fXg, sqrt(fYg*fYg + fZg*fZg))*180.0)/M_PI;
+            xSemaphoreGive( xSemaphore );
+        }
+      }
 
        // realizar um delay e inicializar leitura daqui a 50 ms
       vTaskDelay(200 / portTICK_PERIOD_MS);
    }
 }
+
+
+// Obtêm o valor em segundos timestamp  
+uint32_t get_sec() {
+
+ struct timeval tv;
+
+ gettimeofday(&tv,NULL);
+ // para retornar em microsegundos
+ //return (tv.tv_sec*1000000 + tv.tv_usec);
+  return tv.tv_sec;
+
+}
+
