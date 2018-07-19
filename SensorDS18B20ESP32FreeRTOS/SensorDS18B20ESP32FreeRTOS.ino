@@ -40,7 +40,7 @@ static void leituraSensorTemperatura(void *){
 	  sensors.requestTemperatures(); 
 	  Serial.println("Completo");
 	 
-	  Serial.print("Temperatura do dispositivo com indice 0: ");
+	  Serial.print("Temperatura do dispositivo com indice 0 com FreeRTOS: ");
 	  // escolhe o sensor com indice 0 para printar os dados da temperatura
 	  Serial.println(sensors.getTempCByIndex(0));  
       vTaskDelay(1000 / portTICK_PERIOD_MS);
