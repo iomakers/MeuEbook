@@ -1,4 +1,4 @@
-#include <mfrc522.h> //biblioteca responsável pela comunicação com o módulo RFID-RC522
+#include <MFRC522.h> //biblioteca responsável pela comunicação com o módulo RFID-RC522
 #include <SPI.h> //biblioteca para comunicação do barramento SPI
 // http://www.fernandok.com/2018/02/esp32-com-rfid-controle-de-acesso.html
 #define SS_PIN    21
@@ -46,10 +46,9 @@ void loop()
   }
 
   // Leitura de Dados RFID
-  //buffer para colocar os dados lidos
-  byte buffer[SIZE_BUFFER] = {0};
-  // passa o buffer via referencia
-  leituraDados(buffer);
+
+  // Leitura dos dados 
+  leituraDados();
 
   // instrui o PICC quando no estado ACTIVE a ir para um estado de "parada"
   mfrc522.PICC_HaltA();
@@ -58,7 +57,7 @@ void loop()
 }
 
 //faz a leitura dos dados do cartão/tag
-void leituraDados(byte &buffer)
+void leituraDados(byte *buffer)
 {
   //imprime os detalhes técnicos do cartão/tag
   mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
@@ -66,12 +65,11 @@ void leituraDados(byte &buffer)
   //Prepara a chave - todas as chaves estão configuradas para FFFFFFFFFFFFh (Padrão de fábrica).
   for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF;
 
-
-
   //bloco que faremos a operação
   byte bloco = 1;
   byte tamanho = SIZE_BUFFER;
-
+   //buffer para colocar os dados lidos
+  byte buffer[SIZE_BUFFER] = {0};
 
   //faz a autenticação do bloco que vamos operar
   status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, bloco, &key, &(mfrc522.uid)); //line 834 of MFRC522.cpp file
@@ -95,10 +93,8 @@ void leituraDados(byte &buffer)
   Serial.print(bloco);Serial.print(F("]: "));
 
   //imprime os dados lidos
-  for (uint8_t i = 0; i < MAX_SIZE_BLOCK; i++)
-  {
-      Serial.write(buffer[i]);
-  }
+  Serial.write(buffer, MAX_SIZE_BLOCK);
+
   Serial.println(" ");
 
 
