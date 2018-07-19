@@ -1,6 +1,6 @@
 
 // definir porta de leitura do sensor de presenca
-const int portaPresenca = GPIO_NUM_20;
+const int portaPresenca = GPIO_NUM_12;
 // declarar protótipo da tarefa que irá realizar leitura do sensor de presenca
 static void leituraSensorPresenca(void * );
 void setup() {
@@ -11,11 +11,11 @@ void setup() {
   // declarar tarefa que irá realizar a leitura do sensor de chuva
   xTaskCreate(leituraSensorPresenca, "leituraSensorPresenca", 4096,   NULL, 1, NULL);
 
-  
+
 }
 
 void loop() {
- 
+
 }
 // Tarefa do sensor de Presenca
 static void leituraSensorPresenca(void *){
@@ -31,9 +31,5 @@ static void leituraSensorPresenca(void *){
       }
       // realizar um delay e inicializar leitura daqui a 500 ms
       vTaskDelay(500 / portTICK_PERIOD_MS);
-  } 
+  }
 }
-
-
-
-

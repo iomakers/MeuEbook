@@ -14,13 +14,25 @@ void setup()
     Serial.begin(115200);
     sensor.begin();       //inicializa sensor
     xTaskCreate(&leituraGY80, "leituraGY80", 4096, NULL, 20, NULL);
+    xTaskCreate(&printSerial, "printSerial", 4096, NULL, 20, NULL);
 }
-
 
 void loop()
 {
+}
 
+// Leitura do GY80 a cada 250 ms
+static void leituraGY80(){
+  while (1) {
+    val = sensor.read_scaled();
+    vTaskDelay(250 / portTICK_PERIOD_MS);
+  }
 
+}
+
+// Leitura do GY80 a cada 250 ms
+static void printSerial(){
+  while (1) {
     Serial.print("Mag:");                         //magnetometer values
     Serial.print(val.m_x,2);
     Serial.print(',');
@@ -48,15 +60,7 @@ void loop()
     Serial.print("T:");                           //temperature values
     Serial.println(val.t,1);
 
-
-    delay(1000);        // printar no serial a cada 1 segundo
-}
-
-// Leitura do GY80 a cada 250 ms
-static void leituraGY80(){
-  while (1) {
-    val = sensor.read_scaled();
-    vTaskDelay(250 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 
 }

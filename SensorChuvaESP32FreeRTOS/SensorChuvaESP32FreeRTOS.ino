@@ -11,11 +11,11 @@ void setup() {
   // declarar tarefa que irá realizar a leitura do sensor de chuva
   xTaskCreate(leituraSensorChuva, "leituraSensorChuva", 4096,   NULL, 1, NULL);
 
-  
+
 }
 
 void loop() {
- 
+
 }
 // Tarefa do sensor de chuva
 static void leituraSensorChuva(void *){
@@ -24,13 +24,9 @@ static void leituraSensorChuva(void *){
      // realizar leitura do sensor de chuva
       int leitura = analogRead(portaChuva);
       // Realizar o print da leitura no serial
-      Serial.println("Leitura do Sensor de Chuva:");
+      Serial.println("Leitura do Sensor de Chuva usando FreeRTOS:");
       Serial.println(leitura);
-      // realizar um delay e inicializar leitura daqui a 2 segundos
-      vTaskDelay(2000 / portTICK_PERIOD_MS);
-  } 
+      // realizar um delay e inicializar leitura daqui a 1 segundos
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
 }
-
-
-
-

@@ -1,6 +1,6 @@
 
 #include "DHT11_ESP32.h"
-//cria uma  instancia DHT11 na porta 
+//cria uma  instancia DHT11
 DHT11_ESP32 DHT(GPIO_NUM_4);
 
 void setup()

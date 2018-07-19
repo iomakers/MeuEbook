@@ -1,5 +1,5 @@
 // definir porta de leitura do sensor de chuva
-const int portaChuva = GPIO_NUM_35
+const int portaChuva = GPIO_NUM_35;
 
 void setup() {
   // inicializar serial

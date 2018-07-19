@@ -1,5 +1,5 @@
 // definir porta de leitura do sensor de presenca
-const int portaPresenca = GPIO_NUM_25;
+const int portaPresenca = GPIO_NUM_12;
 
 void setup() {
   // inicializar serial
@@ -17,7 +17,7 @@ void loop() {
   }else{
     Serial.println("Sem presenca de ninguem");
   }
- 
+
   // realizar um delay  e inicializar leitura daqui a 500 ms
   delay(500);
 

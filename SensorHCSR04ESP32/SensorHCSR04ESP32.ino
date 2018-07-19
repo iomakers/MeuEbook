@@ -1,9 +1,12 @@
+#include <Ultrasonic.h>
+//conexão dos pinos para o sensor ultrasonico
+#define PORTA_TRIGGER   GPIO_NUM_34
+#define PORTA_ECHO      GPIO_NUM_35
 
-#include <UltraEsp32.h>
-
-double  distancia  = 0;
-//cria uma  instancia do sensor de distancia
-UltraEsp32 ultra(GPIO_NUM_22, GPIO_NUM_23);
+//Inicializa o sensor nos pinos definidos acima
+Ultrasonic ultrasonic(PORTA_TRIGGER, PORTA_ECHO);
+// declarar variável distancia do tipo inteiro sem sinal
+float distancia;
 
 void setup()
 {
@@ -14,8 +17,10 @@ void setup()
 
 void loop()
 {
-    double  distancia  =  ultra.ultrassonicRead();
-    Serial.println("Leitura do Sensor de Distancia:");
+    // realiza a leitura da distancia
+    ultrasonic.measure();
+    distancia = ultrasonic.get_cm();
+    Serial.println("Leitura do Sensor de Distancia em cm:");
     Serial.println(distancia);
-    delay(1000);
+    delay(500);
 }
