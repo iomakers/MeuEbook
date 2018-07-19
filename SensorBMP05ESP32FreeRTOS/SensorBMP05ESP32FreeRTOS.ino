@@ -16,7 +16,6 @@ int32_t altitude;
 static void leituraBarometro(void * );
 void setup()
 {
- 
   Wire.begin();
   barometer.initialize();
   Serial.begin(115200);
@@ -29,16 +28,11 @@ void setup()
 void loop()
 {
 
-    // Printar leituras do barametro
-    Serial.println("Barametro");
-    Serial.print("Temperatura: ");Serial.println(temperatura); 
-    Serial.print("Pressao: ");Serial.println(pressao); 
-    Serial.print("Altitude: "); Serial.println(altitude);
-  
-    delay(500);
+
+
 }
 
-// Tarefa da leitura do sensor barometro
+// Tarefa da leitura do sensor barômetro
 static void leituraBarometro(void *){
 
   while(1){
@@ -56,9 +50,17 @@ static void leituraBarometro(void *){
 
     // Calcula valor da altitude baseado na leitura de pressão
     altitude = barometer.getAltitude(pressao);
+
+     // Printar leituras do barômetro
+    Serial.println("Barometro");
+    Serial.print("Temperatura: ");Serial.print(temperatura); Serial.println(" Cº");
+    Serial.print("Pressao: ");Serial.print(pressao); Serial.println(" Pa");
+    Serial.print("Altitude: "); Serial.print(altitude); Serial.println(" m");
+  
+    //delay(500);
 	     
-     // realizar um delay e inicializar leitura daqui a 50 ms
-    vTaskDelay(50 / portTICK_PERIOD_MS);
+     // realizar um delay e inicializar leitura daqui a 200 ms
+    vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
 

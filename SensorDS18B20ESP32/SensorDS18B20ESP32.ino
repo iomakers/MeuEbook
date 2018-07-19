@@ -34,4 +34,6 @@ void loop(void)
   Serial.print("Temperatura do dispositivo com indice 0: ");
   // escolhe o sensor com indice 0 para printar os dados da temperatura
   Serial.println(sensors.getTempCByIndex(0));  
+  // realizar leitura a cada 1 segundo
+  delay(1000);
 }

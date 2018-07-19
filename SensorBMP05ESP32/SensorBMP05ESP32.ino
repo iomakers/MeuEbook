@@ -42,10 +42,10 @@ void loop()
     altitude = barometer.getAltitude(pressao);
 
     // Printar leituras do barametro
-    Serial.println("Barametro");
-    Serial.print("Temperatura: ");Serial.println(temperatura); 
-    Serial.print("Pressao: ");Serial.println(pressao); 
-    Serial.print("Altitude: "); Serial.println(altitude);
+    Serial.println("Barometro");
+    Serial.print("Temperatura: ");Serial.print(temperatura); Serial.println(" Cº");
+    Serial.print("Pressao: ");Serial.print(pressao); Serial.println(" Pa");
+    Serial.print("Altitude: "); Serial.print(altitude); Serial.println(" m");
   
     delay(250);
 }

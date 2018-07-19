@@ -23,8 +23,8 @@ void loop()
  // realizar leitura do magnetometro
     mag.getHeading(&mx, &mx, &mz);
 
-    // Printar leitura do magnetomento
-    Serial.println("Magnetomentro:");
+    // Printar leitura do magnetometo
+    Serial.println("Magnetometro:");
     Serial.print("Eixo X: ");
     Serial.println(mx); 
     Serial.print("Eixo Y: ");

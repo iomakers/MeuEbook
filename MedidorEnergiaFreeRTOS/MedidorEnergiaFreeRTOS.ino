@@ -34,12 +34,15 @@ float  Vrms = 0;
 const int TCPin = GPIO_NUM_34;
 const int TPPin = GPIO_NUM_35;
 TaskHandle_t samplerTaskHandle = NULL;
+SemaphoreHandle_t xSemaphore = NULL;
+
+xSemaphore = xSemaphoreCreateMutex();
 
 // Declarar protótipos das funções
 static void Amostrador(void *);
 void IRAM_ATTR onTimer();
 static void calculaRMS(void *);
-
+void calibraOffset(const int *, float * );
 void setup()
 {
   
@@ -48,13 +51,17 @@ void setup()
    pinMode(TCPin, INPUT);
    pinMode(TPPin, INPUT);
    ADCcounts = pow(2, ADCresolution);
+   calibraOffset(&TCPin,&offsetTC);
+   Serial.println("offset TC: "); Serial.print(offsetTC);
+    calibraOffset(&TPPin,&offsetTP);
+   Serial.println("offset TP: "); Serial.print(offsetTP);
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, &onTimer, true);
   timerAlarmWrite(timer, 1041, true);
   timerAlarmEnable(timer);
-  // Declarar tarefas para rodar no core 0 do Esp32
-  xTaskCreatePinnedToCore(&Amostrador, "Amostrador", 4096, NULL, 1000, &samplerTaskHandle, 0);
-  xTaskCreatePinnedToCore(&calculaRMS, "calculaRMS", 4096, NULL, 0, NULL, 0);
+  // Declarar tarefas para rodar no core 1 do Esp32
+  xTaskCreatePinnedToCore(&Amostrador, "Amostrador", 4096, NULL, 1000, &samplerTaskHandle, 1);
+  xTaskCreatePinnedToCore(&calculaRMS, "calculaRMS", 4096, NULL, 0, NULL, 1);
   
 }
 
@@ -65,10 +72,19 @@ void setup()
 
 void loop(){
 
-  digitalWrite(CARGA_PORT, !mb.Coil(CARGA_COIL));
-  mb.Ists(NIVEL_0, digitalRead(NIVEL_PORT));
+}
+
+void calibraOffset(const int * porta, float * offset){
+	float leitura = 0;
+	// realiza 200 leituras
+	int N = 200;
+	for(int i; i<N; i++){
+		leitura = leitura + (((analogRead(porta)*A)/ADCcounts));
+	}
+	offset = leitura/N;
 
 }
+
 
 static void Amostrador(void *){
   uint32_t ulNotificationValue;
@@ -77,19 +93,25 @@ static void Amostrador(void *){
       // Notificação recebida da interrupção do temporizador
       ulNotificationValue = ulTaskNotifyTake(pdFALSE, xMaxBlockTime);
       if( ulNotificationValue == 1 ){
-
-            if (flag) {
+		  // só atualiza o vetor quando o mutex é dado pela função calcula rms
+			 if( xSemaphore != NULL ){
+				 if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+				 {
+           
                 /* leitura de tensão e corrente */
                 I[i] = ganhoTC*(((analogRead(TCPin)*A)/ADCcounts)-offsetTC);
                 V[i] = ganhoTP*(((analogRead(TPPin)*A)/ADCcounts)-offsetTP);
                 
                 i++;
-           }
+           
             // zera o contador quando é ultrapassado o valor maior que TAM
-            if(i>TAM-1){
-             i = 0;
-             flag = false;
-            }
+					if(i>TAM-1){
+					 i = 0;
+					 xSemaphoreGive( xSemaphore );
+					}
+				}
+			}
+	  }
       }
   }
 }
@@ -100,8 +122,10 @@ static void Amostrador(void *){
 static void calculaRMS(void *) {
 
   while(1) {
-   if (flag == false) {
-    
+	  // usamos aqui um mutex para garantir que os cálculos sejam realizados com o vetor completo
+   if( xSemaphore != NULL ){
+	if( xSemaphoreTake( xSemaphore, ( TickType_t ) 10 ) == pdTRUE )
+	{
       Irms = 0;
       for (size_t k = 0; k < TAM; k++) {
         Irms = Irms + I[k]*I[k];
@@ -117,14 +141,15 @@ static void calculaRMS(void *) {
       }
       Vrms = Vrms/TAM;
       Vrms = sqrt(Vrms);
-  
-      flag = true;
+      xSemaphoreGive( xSemaphore );     
+	}
+   }
       Serial.println("Valor Tensao RMS");
       Serial.println(Vrms);
       Serial.println("Valor Corrente RMS");
       Serial.println(Irms);
-      
-   }
+   
+   
     vTaskDelay(2000 / portTICK_PERIOD_MS);
   }
 
