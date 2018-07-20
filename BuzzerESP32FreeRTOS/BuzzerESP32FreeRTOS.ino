@@ -31,6 +31,6 @@ static void mudaBuzzer(void *){
 	  ledcWrite(canalBuzzer, valorBuzzer);
 	  // Quando o valor maior que 255, ele estoura e volta para 0
 	  valorBuzzer ++;
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }

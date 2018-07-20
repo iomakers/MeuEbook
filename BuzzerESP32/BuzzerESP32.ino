@@ -18,6 +18,6 @@ void loop() {
 	// Com resolução de 8 Bits resulta valores de escrita entre 0 e 255
    ledcWrite(canalBuzzer, valorBuzzer);
    valorBuzzer ++;
-   delay(250);
+   delay(100);
    
 }
