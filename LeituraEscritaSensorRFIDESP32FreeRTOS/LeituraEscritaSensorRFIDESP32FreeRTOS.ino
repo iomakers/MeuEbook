@@ -102,7 +102,7 @@ static void leDadosSerial(void *){
           }    
           if(op == 48){
             estado = 2;
-            xTaskCreate(&leituraDados, "LeituraDados", 4096, NULL, 1000, &referenciaLeituraDados);
+            xTaskCreate(&leituraDados, "leituraDados", 4096, NULL, 1000, &referenciaLeituraDados);
           }
           if(op == 49){
             // estado printar gravar dados
