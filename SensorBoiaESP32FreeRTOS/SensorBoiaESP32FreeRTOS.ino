@@ -1,6 +1,6 @@
 
 // definir porta de leitura do sensor boia
-const int portaBOIA = GPIO_NUM_12;
+const int portaBOIA = GPIO_NUM_17;
 // declarar protótipo da tarefa que irá realizar leitura do sensor boia
 static void leituraSensorBoia(void * );
 void setup() {

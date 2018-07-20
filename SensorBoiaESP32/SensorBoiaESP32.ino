@@ -1,5 +1,5 @@
 // definir porta de leitura do sensor de boia
-const int portaBOIA = GPIO_NUM_12;
+const int portaBOIA = GPIO_NUM_17;
 
 void setup() {
   // inicializar serial
