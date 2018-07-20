@@ -14,7 +14,7 @@ void IRAM_ATTR gpio_isr_handler_up(void* arg)
 /*
 Inicializa sensor de vazão com interrupção na subida de um pulso
  */
-void iniciaVazao(const int Port){
+void iniciaVazao(gpio_num_t Port){
   gpio_set_direction(Port, GPIO_MODE_INPUT);
   gpio_set_intr_type(Port, GPIO_INTR_NEGEDGE);
   gpio_set_pull_mode(Port, GPIO_PULLUP_ONLY);
@@ -27,7 +27,7 @@ void setup() {
   // inicializar serial
   Serial.begin(115200);
   // definir porta do sensor de gas como entrada
-  iniciaVazao(portaVazao);
+  iniciaVazao((gpio_num_t) portaVazao);
 }
 
 void loop() {
