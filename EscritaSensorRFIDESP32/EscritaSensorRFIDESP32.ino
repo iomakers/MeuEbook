@@ -58,7 +58,7 @@ void gravarDados()
   mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
   // aguarda 30 segundos para entrada de dados via Serial
   Serial.setTimeout(30000L) ;
-  Serial.println(F("Insira os dados a serem gravados com o caractere '#' ao final\n[máximo de 16 caracteres]:"));
+  Serial.println(F("Insira os dados a serem gravados com o caractere '$' ao final\n[máximo de 16 caracteres]:"));
 
   //Prepara a chave - todas as chaves estão configuradas para FFFFFFFFFFFFh (Padrão de fábrica).
   for (byte i = 0; i < 6; i++) key.keyByte[i] = 0xFF;
@@ -69,8 +69,8 @@ void gravarDados()
   byte tamanhoDados; //tamanho dos dados que vamos operar (em bytes)
 
   //recupera no buffer os dados que o usuário inserir pela serial
-  //serão todos os dados anteriores ao caractere '#'
-  tamanhoDados = Serial.readBytesUntil('#', (char*)buffer, MAX_SIZE_BLOCK);
+  //serão todos os dados anteriores ao caractere '$'
+  tamanhoDados = Serial.readBytesUntil('$', (char*)buffer, MAX_SIZE_BLOCK);
   //espaços que sobrarem do buffer são preenchidos com espaço em branco
   for(byte i=tamanhoDados; i < MAX_SIZE_BLOCK; i++)
   {

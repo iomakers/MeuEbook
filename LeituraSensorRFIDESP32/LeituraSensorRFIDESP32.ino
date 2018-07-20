@@ -1,6 +1,6 @@
 #include <MFRC522.h> //biblioteca responsável pela comunicação com o módulo RFID-RC522
 #include <SPI.h> //biblioteca para comunicação do barramento SPI
-// http://www.fernandok.com/2018/02/esp32-com-rfid-controle-de-acesso.html
+
 #define SS_PIN    21
 #define RST_PIN   22
 
@@ -96,7 +96,5 @@ void leituraDados(byte *buffer)
   Serial.write(buffer, MAX_SIZE_BLOCK);
 
   Serial.println(" ");
-
-
 
 }
