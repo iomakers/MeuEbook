@@ -43,7 +43,7 @@ static void leituraVazao(void *){
   while (1) {
 	  
     vazao = pulsos_vazao/5.5;
-	  Serial.println("Pulsos num minuto:");
+	Serial.println("Pulsos num segundo:");
     Serial.println(pulsos_vazao);
     pulsos_vazao = 0;
     vTaskDelay(1000 / portTICK_PERIOD_MS);
