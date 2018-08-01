@@ -1,7 +1,7 @@
 #include <Ultrasonic.h>
 //conexão dos pinos para o sensor ultrasonico
-#define PORTA_TRIGGER   GPIO_NUM_34
-#define PORTA_ECHO      GPIO_NUM_35
+#define PORTA_TRIGGER   GPIO_NUM_35
+#define PORTA_ECHO      GPIO_NUM_34
 
 //Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic(PORTA_TRIGGER, PORTA_ECHO);
@@ -12,7 +12,7 @@ void setup()
 {
     // Inicializa
     Serial.begin(115200);
-    // declarar tarefa de leitura do sensor ultrasonico   
+    // declarar tarefa de leitura do sensor ultrasonico
     xTaskCreate(&leituraHCSR04, "leituraHCSR04", 4096, NULL, 20, NULL);
 }
 
