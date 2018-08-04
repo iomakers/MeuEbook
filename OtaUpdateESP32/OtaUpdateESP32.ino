@@ -157,7 +157,8 @@ void execOTA() {
       } else {
         Serial.println("Error Occurred. Error #: " + String(Update.getError()));
       }
-    } else {
+    } 
+    else {
       // not enough space to begin OTA
       // Understand the partitions and
       // space availability

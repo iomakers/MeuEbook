@@ -24,8 +24,8 @@ static void leituraSensorLDR(void *){
      // realizar leitura do sensor de ldr
       int leitura = analogRead(portaLDR);
       // Realizar o print da leitura no serial
-      Serial.println("Leitura do Sensor LDR usando FreeRTOS:");
-      Serial.println(leitura);
+  //    Serial.println("Leitura do Sensor LDR usando FreeRTOS:");
+    //  Serial.println(leitura);
       // realizar um delay e inicializar leitura daqui a 1 segundos
       vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
